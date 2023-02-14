@@ -1,5 +1,6 @@
 <?php
-class UserGateway {
+class UserGateway 
+{
 
     private $db = null;
 
@@ -68,7 +69,8 @@ class UserGateway {
         }  
     }
 
-    public function FindUser($id){
+    public function Find($id)
+    {
        
         $statement ="
         SELECT `firstName`, `lastName`, `tlfnr`, `email`, `adress`, City.zip, City.name, UserType.name
@@ -86,16 +88,22 @@ class UserGateway {
 
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+            if(! $result) 
+            {
+                echo "noo result";
+            }
+
             return $result;
-           
+       
 
-        } catch (\PDOException $e) {
-
+        } catch (\PDOException $e) 
+        {
             exit($e->getMessage());
         }    
     }
 
-    public FindAllUser() {
+    public function FindAll() 
+    {
         $statement = "SELECT `firstName`, `lastName`, `tlfnr`, `email`, `adress`, City.zip, City.name, UserType.name
         FROM Users 
         INNER JOIN City ON Users.zip_id = City.id

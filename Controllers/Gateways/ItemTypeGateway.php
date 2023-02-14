@@ -27,7 +27,7 @@ class ItemtypeGateway
         }    
     }
 
-    public function FindItem($id)
+    public function Find($id)
     {
         $statement ="
         SELECT name  
@@ -51,7 +51,7 @@ class ItemtypeGateway
         }    
     }
 
-    public FindAllItems() 
+    public function FindAll() 
     {
         $statement = "SELECT name
         FROM ItemType 

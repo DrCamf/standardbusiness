@@ -1,6 +1,6 @@
 <?php
 
-class CityGateway 
+class OrderLineGateway 
 {
     private $db = null;
 
@@ -9,15 +9,17 @@ class CityGateway
     public function Insert(Array $input , $num)
     {
         $statement = "
-        INSERT INTO `City`(`zip`, `name`) VALUES (:zip, :name); ";
+        INSERT INTO `OrderLine`( `amount`, `price`, `order_id`, `item_id`) VALUES (:amount, :price, :orderid, :itemid); ";
  
         try 
         {
             $statement = $this->db->prepare($statement);
 
             $statement->execute(array(
-                'zip' => $input['zip'],
-                'name' => $input['name']
+                'amount' => $input['amount'],
+                'price' => $input['price'],
+                'orderid'  => $input['orderid'],
+                'itemid'  => $input['itemid']
             ));
 
             return $statement->rowCount();
@@ -31,9 +33,11 @@ class CityGateway
     public function Find($id)
     {
         $statement ="
-        SELECT zip, name  
-        FROM City 
-        WHERE id = :id;
+        SELECT amount, price, Orders.orderNbr, Item.name FROM 
+        FROM OrderLine 
+        INNER JOIN Item ON OrderLine.item_id = Item.id
+        INNER JOIN Orders ON OrderLine.order_id = Orders.id
+        WHERE OrderLine.id = :id;
         ";
 
         try 
@@ -54,9 +58,10 @@ class CityGateway
 
     public function FindAll() 
     {
-        $statement = "SELECT zip, name
-        FROM City 
-        
+        $statement = "SELECT amount, price, Orders.orderNbr, Item.name
+        INNER JOIN Item ON OrderLine.item_id = Item.id
+        INNER JOIN Orders ON OrderLine.order_id = Orders.id
+        FROM OrderLine
         ; "; //evt order by 
 
         try 
@@ -77,10 +82,12 @@ class CityGateway
     public function Update($id, Array $input)
     {
         $statement = "
-            UPDATE City
+            UPDATE OrderLine
             SET 
-                `zip`= IsNull(:zip, zip),
-                `name`= IsNull(:name, name)
+                `amount`= IsNull(:amount, amount),
+                `price`= IsNull(:price, price),
+                `order_id`= IsNull(:orderid, order_id),
+                `item_id`= IsNull(:itemid, item_id)
             WHERE id = :id;
         ";
 
@@ -90,9 +97,10 @@ class CityGateway
 
             $statement->execute(array(
                 'id' => $id,
-                'zip' => $input['zip'],
-                'name' => $input['name']
-                
+                'amount' => $input['amount'],
+                'price' => $input['price'],
+                'orderid'  => $input['orderid'],
+                'itemid'  => $input['itemid']
             ));
             return $statement->rowCount();
         
@@ -105,7 +113,7 @@ class CityGateway
     public function Delete($id)
     {
         $statement = "
-            DELETE FROM City
+            DELETE FROM OrderLine
             WHERE id = :id;
         ";
 
@@ -120,6 +128,6 @@ class CityGateway
             exit($e->getMessage());
         }    
     }
-}
 
+}
 ?>

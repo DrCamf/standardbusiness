@@ -12,8 +12,7 @@ class DbConn {
             $this->dbConnection = new \PDO(
                 "mysql:host=$host;charset=utf8mb4;dbname=$database",
                 $username,
-                $password
-            );
+                $password);
 
         } catch (\PDOException $e) 
         {

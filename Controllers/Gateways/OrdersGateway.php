@@ -30,7 +30,7 @@ class OrdersGateway
         }    
     }
 
-    public function FindOrder($id)
+    public function Find($id)
     {
         $statement ="
         SELECT Users.firstName, Users.lastName, Users.email, `orderNbr`,`orderDate`, `user_id` FROM 
@@ -55,7 +55,7 @@ class OrdersGateway
         }    
     }
 
-    public FindAllOrders() 
+    public function FindAll() 
     {
         $statement = "SELECT `orderNbr`,`orderDate`, `user_id` FROM Orders
         ; "; //evt order by 

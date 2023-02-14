@@ -30,7 +30,7 @@ class BoughtGateWay
         }    
     }
 
-    public function FindItem($id)
+    public function Find($id)
     {
         $statement ="
         SELECT `price`, `volume`, Item.name, `boughtDate` 
@@ -55,7 +55,7 @@ class BoughtGateWay
         }    
     }
 
-    public FindAllItems() 
+    public function FindAll() 
     {
         $statement = "SELECT `price`, `volume`, Item.name, `boughtDate` 
         FROM ItemBought 

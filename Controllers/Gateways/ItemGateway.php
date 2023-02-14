@@ -28,7 +28,7 @@ class ItemGateway
         }    
     }
 
-    public function FindItem($id)
+    public function Find($id)
     {
         $statement ="
         SELECT Item.name, ItemType.name  
@@ -53,11 +53,11 @@ class ItemGateway
         }    
     }
 
-    public FindAllItems() 
+    public function FindAll() 
     {
         $statement = "SELECT Item.name, ItemType.name 
-        FROM Item 
         INNER JOIN ItemType ON Item.type_id = ItemType.id
+        FROM Item 
         ; "; //evt order by 
 
         try 
