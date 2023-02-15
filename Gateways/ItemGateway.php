@@ -1,38 +1,59 @@
 <?php
 
-class ItemtypeGateway
+class ItemGateway
 {
     private $db = null;
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input )
     {
-        $statement = "
-        INSERT INTO `ItemType`(`name`) VALUES (:name); ";
- 
-        try 
+        if (array_key_exists('name', $input)) {
+            $statement = "INSERT INTO `Item`(`name`, `type_id`) VALUES (:name, :typeid); ";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array(
+                    'name' => $input['name'],
+                    'typeid' => $input['typeid']
+                ));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+    
+            
+        }else // if the json had an array
         {
-            $statement = $this->db->prepare($statement);
-
-            $statement->execute(array(
-                'name' => $input['name']                
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
-        {
-            exit($e->getMessage());
-        }    
+            $statement = "INSERT INTO `Item`(`name`, `type_id`) VALUES";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['name'] . "', '" .  $item['typeid']. "')," ;
+            }
+            $statement = substr($statement, 0, -1);
+    
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
+       
     }
 
     public function Find($id)
     {
         $statement ="
-        SELECT name  
-        FROM ItemType 
-        WHERE id = :id;
+        SELECT Item.name, ItemType.name  
+        FROM Item 
+        INNER JOIN ItemType ON Item.type_id = ItemType.id
+        WHERE Item.id = :id;
         ";
 
         try 
@@ -53,9 +74,9 @@ class ItemtypeGateway
 
     public function FindAll() 
     {
-        $statement = "SELECT name
-        FROM ItemType 
-       
+        $statement = "SELECT Item.name, ItemType.name 
+        INNER JOIN ItemType ON Item.type_id = ItemType.id
+        FROM Item 
         ; "; //evt order by 
 
         try 
@@ -76,9 +97,10 @@ class ItemtypeGateway
     public function Update($id, Array $input)
     {
         $statement = "
-            UPDATE ItemType
+            UPDATE Item
             SET 
                 `name`= IsNull(:name, name),
+                `type_id`= IsNull(:typeid, type_id)
             WHERE id = :id;
         ";
 
@@ -88,7 +110,8 @@ class ItemtypeGateway
 
             $statement->execute(array(
                 'id' => $id,
-                'name' => $input['name']                
+                'name' => $input['name'],
+                'typeid' => $input['typeid']
             ));
             return $statement->rowCount();
         
@@ -101,7 +124,7 @@ class ItemtypeGateway
     public function Delete($id)
     {
         $statement = "
-            DELETE FROM ItemType
+            DELETE FROM Item
             WHERE id = :id;
         ";
 
@@ -117,5 +140,4 @@ class ItemtypeGateway
         }    
     }
 }
-
 ?>

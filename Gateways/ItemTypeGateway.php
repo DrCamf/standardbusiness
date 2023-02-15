@@ -1,38 +1,53 @@
 <?php
 
-class CityGateway 
+class ItemtypeGateway
 {
     private $db = null;
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input)
     {
-        $statement = "
-        INSERT INTO `City`(`zip`, `name`) VALUES (:zip, :name); ";
- 
-        try 
+        if (array_key_exists('name', $input)) 
+       {
+            $statement = "INSERT INTO `ItemType`(`name`) VALUES (:name);  ";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array('name' => $input['name']));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+
+        } else // if the json had an array
         {
-            $statement = $this->db->prepare($statement);
+            $statement = "INSERT INTO `ItemType`(`name`) VALUES ";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['name'] . "')," ;
+            }
+            $statement = substr($statement, 0, -1);
 
-            $statement->execute(array(
-                'zip' => $input['zip'],
-                'name' => $input['name']
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
-        {
-            exit($e->getMessage());
-        }    
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
     }
 
     public function Find($id)
     {
         $statement ="
-        SELECT zip, name  
-        FROM City 
+        SELECT name  
+        FROM ItemType 
         WHERE id = :id;
         ";
 
@@ -54,9 +69,9 @@ class CityGateway
 
     public function FindAll() 
     {
-        $statement = "SELECT zip, name
-        FROM City 
-        
+        $statement = "SELECT name
+        FROM ItemType 
+       
         ; "; //evt order by 
 
         try 
@@ -77,10 +92,9 @@ class CityGateway
     public function Update($id, Array $input)
     {
         $statement = "
-            UPDATE City
+            UPDATE ItemType
             SET 
-                `zip`= IsNull(:zip, zip),
-                `name`= IsNull(:name, name)
+                `name`= IsNull(:name, name),
             WHERE id = :id;
         ";
 
@@ -90,9 +104,7 @@ class CityGateway
 
             $statement->execute(array(
                 'id' => $id,
-                'zip' => $input['zip'],
-                'name' => $input['name']
-                
+                'name' => $input['name']                
             ));
             return $statement->rowCount();
         
@@ -105,7 +117,7 @@ class CityGateway
     public function Delete($id)
     {
         $statement = "
-            DELETE FROM City
+            DELETE FROM ItemType
             WHERE id = :id;
         ";
 

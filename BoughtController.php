@@ -1,14 +1,15 @@
 <?php
-include_once 'Config/DbConn.php';
 
-include_once 'Gateways/ItemGateway.php';
+include_once 'DbConn.php';
 
-class ItemController
+include_once 'Gateways/BoughtGateWay.php';
+
+class BoughtController
 {
     private $db;
     private $requestMethod;
     private $input;
-    private $itemgateway;
+    private $boughtgateway;
 
     public function __construct( $requestMethod, $input)
     {
@@ -17,7 +18,7 @@ class ItemController
         $this->requestMethod = $requestMethod;
         $this->input = $input;
 
-        $this->itemgateway = new ItemGateway($db->getConnection());
+        $this->boughtgateway = new BoughtGateWay($db->getConnection());
     }
 
     public function processRequest()
@@ -70,7 +71,7 @@ class ItemController
 
         }*/
                 
-        $this->itemgateway->Insert($input);
+        $this->boughtgateway->Insert($input);
 
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
 
@@ -82,7 +83,7 @@ class ItemController
 
     private function GetOneFromRequest($id)
     {
-        $result = $this->itemgateway->Find($id);
+        $result = $this->boughtgateway->Find($id);
 
         /*if (! $result) {
             return $this->notFoundResponse();
@@ -95,7 +96,7 @@ class ItemController
 
     private function GetAll()
     {
-        $result = $this->itemgateway->FindAll();
+        $result = $this->boughtgateway->FindAll();
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
        
@@ -105,7 +106,7 @@ class ItemController
     private function UpdateFromRequest($id)
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        $this->itemgateway->Update($id, $input);
+        $this->boughtgateway->Update($id, $input);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -113,11 +114,11 @@ class ItemController
 
     private function Delete($id)
     {
-        $result = $this->itemgateway->find($id);
+        $result = $this->boughtgateway->find($id);
         if (! $result) {
             return $this->NotFoundResponse();
         }
-        $this->itemgateway->Delete($id);
+        $this->boughtgateway->Delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -155,8 +156,5 @@ class ItemController
         $response['body'] = null;
         return $response;
     }
-
 }
-
-
 ?>

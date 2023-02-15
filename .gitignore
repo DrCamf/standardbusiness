@@ -1,1 +1,2 @@
-/Controllers/Config/config.php
+/Config/config.php
+DbConn.php

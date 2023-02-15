@@ -6,25 +6,40 @@ class AccountGateway
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input)
     {
-        $statement = "
-        INSERT INTO `Account`(`password`) VALUES (:password); ";
- 
-        try 
+        if (array_key_exists('password', $input)) {
+            $statement = "INSERT INTO `Account`(`password`) VALUES (:password); ";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array('password' => $input['password']));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+    
+        } else // if the json had an array
         {
-            $statement = $this->db->prepare($statement);
-
-            $statement->execute(array(
-                'password' => $input['password']                
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
-        {
-            exit($e->getMessage());
-        }    
+            $statement = " INSERT INTO `Account`(`password`) VALUES";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['password'] . "')," ;
+            }
+            $statement = substr($statement, 0, -1);
+    
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
     }
 
     public function Find($id)

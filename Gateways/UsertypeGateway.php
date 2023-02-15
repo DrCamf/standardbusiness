@@ -1,43 +1,54 @@
 <?php
 
-class OrderLineGateway 
+class UsertypeGateway
 {
     private $db = null;
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input )
     {
-        $statement = "
-        INSERT INTO `OrderLine`( `amount`, `price`, `order_id`, `item_id`) VALUES (:amount, :price, :orderid, :itemid); ";
- 
-        try 
+       if (array_key_exists('name', $input)) 
+       {
+            $statement = "INSERT INTO `UserType`(`name`) VALUES (:name); ";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array('name' => $input['name']));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+
+        } else // if the json had an array
         {
-            $statement = $this->db->prepare($statement);
+            $statement = "INSERT INTO `UserType`(`name`) VALUES";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['name'] . "')," ;
+            }
+            $statement = substr($statement, 0, -1);
 
-            $statement->execute(array(
-                'amount' => $input['amount'],
-                'price' => $input['price'],
-                'orderid'  => $input['orderid'],
-                'itemid'  => $input['itemid']
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
-        {
-            exit($e->getMessage());
-        }    
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
     }
 
     public function Find($id)
     {
         $statement ="
-        SELECT amount, price, Orders.orderNbr, Item.name FROM 
-        FROM OrderLine 
-        INNER JOIN Item ON OrderLine.item_id = Item.id
-        INNER JOIN Orders ON OrderLine.order_id = Orders.id
-        WHERE OrderLine.id = :id;
+        SELECT name  
+        FROM UserType 
+        WHERE id = :id;
         ";
 
         try 
@@ -58,10 +69,9 @@ class OrderLineGateway
 
     public function FindAll() 
     {
-        $statement = "SELECT amount, price, Orders.orderNbr, Item.name
-        INNER JOIN Item ON OrderLine.item_id = Item.id
-        INNER JOIN Orders ON OrderLine.order_id = Orders.id
-        FROM OrderLine
+        $statement = "SELECT name
+        FROM UserType 
+       
         ; "; //evt order by 
 
         try 
@@ -82,12 +92,9 @@ class OrderLineGateway
     public function Update($id, Array $input)
     {
         $statement = "
-            UPDATE OrderLine
+            UPDATE UserType
             SET 
-                `amount`= IsNull(:amount, amount),
-                `price`= IsNull(:price, price),
-                `order_id`= IsNull(:orderid, order_id),
-                `item_id`= IsNull(:itemid, item_id)
+                `name`= IsNull(:name, name),
             WHERE id = :id;
         ";
 
@@ -97,10 +104,7 @@ class OrderLineGateway
 
             $statement->execute(array(
                 'id' => $id,
-                'amount' => $input['amount'],
-                'price' => $input['price'],
-                'orderid'  => $input['orderid'],
-                'itemid'  => $input['itemid']
+                'name' => $input['name']                
             ));
             return $statement->rowCount();
         
@@ -113,7 +117,7 @@ class OrderLineGateway
     public function Delete($id)
     {
         $statement = "
-            DELETE FROM OrderLine
+            DELETE FROM UserType
             WHERE id = :id;
         ";
 
@@ -128,6 +132,6 @@ class OrderLineGateway
             exit($e->getMessage());
         }    
     }
-
 }
+
 ?>

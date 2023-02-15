@@ -1,13 +1,13 @@
 <?php
 
-include_once 'Controllers/UserController.php';
-include_once 'Controllers/ItemController.php';
-include_once 'Controllers/OrdersController.php';
-include_once 'Controllers/BoughtController.php';
-include_once 'Controllers/ItemTypeController.php';
-include_once 'Controllers/CityController.php';
-include_once 'Controllers/UserTypeController.php';
-include_once 'Controllers/OrderLineController.php';
+include_once 'UserController.php';
+include_once 'ItemController.php';
+include_once 'OrdersController.php';
+include_once 'BoughtController.php';
+include_once 'ItemTypeController.php';
+include_once 'CityController.php';
+include_once 'UserTypeController.php';
+include_once 'OrderLineController.php';
 
 //C:\xampp\htdocs\standardbusiness\Controllers\UserController.php
 

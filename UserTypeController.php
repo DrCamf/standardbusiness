@@ -1,5 +1,5 @@
 <?php
-include_once 'Config/DbConn.php';
+include_once 'DbConn.php';
 
 include_once 'Gateways/UsertypeGateway.php';
 
@@ -64,14 +64,25 @@ class UserTypeController
     private function CreateFromRequest()
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        /*if(count($input) > 1) {
+            
+            foreach ($input as $item){
+                $this->usertypegateway->Insert($item['name']);
+                sleep(0.1);
+            }
+         
+        } else {*/
+            $this->usertypegateway->Insert($input);
+        
        
+        
         /*if (! $this->validateEvent($input1)) {
 
             return $this->unprocessableEntityResponse();
 
         }*/
                 
-        $this->usertypegateway->Insert($input);
+       
 
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
 

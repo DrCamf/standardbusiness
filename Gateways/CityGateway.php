@@ -1,42 +1,57 @@
 <?php
 
-class BoughtGateWay
+class CityGateway 
 {
     private $db = null;
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input )
     {
-        $statement = "
-        INSERT INTO `ItemBought`(`price`, `volume`, `item_id`, `boughtDate`) VALUES (:price, :volume, :itemid, :boughtdate); ";
- 
-        try 
+        if (array_key_exists('zip', $input)) {
+            $statement = "INSERT INTO `City`(`zip`, `name`) VALUES (:zip, :name); ";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array(
+                    'zip' => $input['zip'],
+                    'name' => $input['name']
+                ));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+    
+        } else // if the json had an array
         {
-            $statement = $this->db->prepare($statement);
+            $statement = "INSERT INTO `City`(`zip`, `name`) VALUES";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['zip'] . "', ' " . $item['name'] .  "')," ;
+            }
+            $statement = substr($statement, 0, -1);
+    
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
 
-            $statement->execute(array(
-                'price' => $input['price'],
-                'volume' => $input['volume'],
-                'itemid' => $input['itemid'],
-                'boughtdate' => $input['boughtdate']
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
-        {
-            exit($e->getMessage());
-        }    
     }
 
     public function Find($id)
     {
         $statement ="
-        SELECT `price`, `volume`, Item.name, `boughtDate` 
-        FROM ItemBought 
-        INNER JOIN Item ON ItemBought.item_id = Item.id
-        WHERE ItemBought.id = :id;
+        SELECT zip, name  
+        FROM City 
+        WHERE id = :id;
         ";
 
         try 
@@ -57,9 +72,9 @@ class BoughtGateWay
 
     public function FindAll() 
     {
-        $statement = "SELECT `price`, `volume`, Item.name, `boughtDate` 
-        FROM ItemBought 
-        INNER JOIN Item ON ItemBought.item_id = Item.id
+        $statement = "SELECT zip, name
+        FROM City 
+        
         ; "; //evt order by 
 
         try 
@@ -80,12 +95,10 @@ class BoughtGateWay
     public function Update($id, Array $input)
     {
         $statement = "
-            UPDATE ItemBought
+            UPDATE City
             SET 
-                `price`= IsNull(:price, price),
-                `volume`= IsNull(:volume, volume),
-                `item_id`= IsNull(:itemid, item_id),
-                `boughtDate`= IsNull(:boughtdate, boughtDate)
+                `zip`= IsNull(:zip, zip),
+                `name`= IsNull(:name, name)
             WHERE id = :id;
         ";
 
@@ -95,10 +108,9 @@ class BoughtGateWay
 
             $statement->execute(array(
                 'id' => $id,
-                'price' => $input['price'],
-                'volume' => $input['volume'],
-                'itemid' => $input['itemid'],
-                'boughtdate' => $input['boughtdate']
+                'zip' => $input['zip'],
+                'name' => $input['name']
+                
             ));
             return $statement->rowCount();
         
@@ -111,7 +123,7 @@ class BoughtGateWay
     public function Delete($id)
     {
         $statement = "
-            DELETE FROM ItemBought
+            DELETE FROM City
             WHERE id = :id;
         ";
 

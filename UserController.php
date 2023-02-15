@@ -1,15 +1,14 @@
 <?php
-include_once 'Config/DbConn.php';
+include_once 'DbConn.php';
 
-include_once 'Gateways/CityGateway.php';
+include_once 'Gateways/UserGateway.php';
 
-
-class CityController
+class UserController 
 {
     private $db;
     private $requestMethod;
     private $input;
-    private $citygateway;
+    private $userGateway;
 
     public function __construct( $requestMethod, $input)
     {
@@ -18,7 +17,7 @@ class CityController
         $this->requestMethod = $requestMethod;
         $this->input = $input;
 
-        $this->citygateway = new CityGateway($db->getConnection());
+        $this->userGateway = new UserGateway($db->getConnection());
     }
 
     public function processRequest()
@@ -61,6 +60,7 @@ class CityController
         }
     }
 
+
     private function CreateFromRequest()
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
@@ -70,8 +70,10 @@ class CityController
             return $this->unprocessableEntityResponse();
 
         }*/
-                
-        $this->itemgateway->Insert($input);
+        
+        $num = $this->userGateway->AccountInsert($input);
+        
+        $this->userGateway->Insert($input, $num);
 
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
 
@@ -83,7 +85,7 @@ class CityController
 
     private function GetOneFromRequest($id)
     {
-        $result = $this->citygateway->Find($id);
+        $result = $this->userGateway->Find($id);
 
         /*if (! $result) {
             return $this->notFoundResponse();
@@ -96,7 +98,7 @@ class CityController
 
     private function GetAll()
     {
-        $result = $this->citygateway->FindAll();
+        $result = $this->userGateway->FindAll();
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
        
@@ -106,7 +108,7 @@ class CityController
     private function UpdateFromRequest($id)
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        $this->citygateway->Update($id, $input);
+        $this->userGateway->Update($id, $input);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -114,11 +116,11 @@ class CityController
 
     private function Delete($id)
     {
-        $result = $this->citygateway->find($id);
+        $result = $this->eventGateway->find($id);
         if (! $result) {
             return $this->NotFoundResponse();
         }
-        $this->citygateway->Delete($id);
+        $this->userGateway->Delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -157,4 +159,5 @@ class CityController
         return $response;
     }
 }
+
 ?>

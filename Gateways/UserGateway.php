@@ -6,34 +6,53 @@ class UserGateway
 
     public function __construct($db)  { $this->db = $db; }
 
-    public function Insert(Array $input , $num)
+    public function Insert(Array $input )
     {
-        $statement = "
-        INSERT INTO `Users`(`firstName`, `lastName`, `tlfnr`, `email`, `adress`, `zip_id`, `type_id`, `account_id`) 
-        VALUES (:firstname, :lastname, :tlfnr, :email, :adress, :zip_id, :type_id, :account_id); ";
- 
-        try 
+        if (array_key_exists('firstName', $input)) 
         {
-            $statement = $this->db->prepare($statement);
+            $statement = "INSERT INTO `Users`(`firstName`, `lastName`, `tlfnr`, `email`, `adress`, `zip_id`, `type_id`, `account_id`) 
+            VALUES (:firstname, :lastname, :tlfnr, :email, :adress, :zipid, :typeid, :accountid);";
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute(array(
+                    'firstname' => $input['firstname'] ,
+                    'lastname'  => $input['lastname'],
+                    'tlfnr' => $input['tlfnr'] ,
+                    'email' => $input['email'] ?? null,
+                    'adress' => $input['adress'] ,
+                    'zipid' => $input['zipid'] ,
+                    'typeid' => $input['typeid'] ,
+                    'accountid' => $input['accountid'] 
+    
+                ));
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
 
-            $statement->execute(array(
-                'firstname' => $input['firstname'] ,
-                'lastname'  => $input['lastname'],
-                'tlfnr' => $input['tlfnr'] ,
-                'email' => $input['email'] ?? null,
-                'adress' => $input['adress'] ,
-                'zip_id' => $input['zip_id'] ,
-                'type_id' => $input['ztype_id'] ,
-                'account_id' => $input['account_id'] 
-
-            ));
-
-            return $statement->rowCount();
-
-        } catch (\PDOException $e) 
+        } else // if the json had an array
         {
-            exit($e->getMessage());
-        }    
+            $statement = "INSERT INTO `Users`(`firstName`, `lastName`, `tlfnr`, `email`, `adress`, `zip_id`, `typeid`, `accountid`)  VALUES";
+            foreach ($input as $item) {
+                $statement .=  "('" . $item['firstname'] . "', '" . $item['lastname'] . "', '" . $item['tlfnr'] . "', '" . $item['email'] . 
+                "', '" .  $item['adress'] . "', '" . $item['zipid'] . "', '" . $item['typeid'] . "', '" . $item['accountid'] ."')," ;
+            }
+            $statement = substr($statement, 0, -1);
+
+            try 
+            {
+                $statement = $this->db->prepare($statement);
+                $statement->execute();
+                return $statement->rowCount();
+            } 
+            catch (\PDOException $e) 
+            {
+                exit($e->getMessage());
+            }    
+        }
     }
 
     function AccountInsert(Array $input) 
@@ -135,9 +154,9 @@ class UserGateway
                 `tlfnr`= IsNull(:tlfnr, tlfnr),
                 `email`= IsNull(:email, email),
                 `adress`= IsNull(:lastname, lastName),:,
-                `zip_id`= IsNull(:zip_id, zip_id),
-                `type_id`= IsNull(:type_id, type_id),
-                `account_id`= IsNull(:account_id, account_id)
+                `zip_id`= IsNull(:zipid, zip_id),
+                `type_id`= IsNull(:typeid, type_id),
+                `account_id`= IsNull(:accountid, account_id)
             WHERE id = :id;
         ";
 
@@ -152,9 +171,9 @@ class UserGateway
                 'tlfnr' => $input['tlfnr'] ,
                 'email' => $input['email'] ?? null,
                 'adress' => $input['adress'] ,
-                'zip_id' => $input['zip_id'] ,
-                'type_id' => $input['type_id'] ,
-                'account_id' => $input['account_id'] 
+                'zipid' => $input['zipid'] ,
+                'typeid' => $input['typeid'] ,
+                'accountid' => $input['accountid'] 
             ));
             return $statement->rowCount();
         

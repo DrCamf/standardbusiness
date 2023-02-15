@@ -1,25 +1,23 @@
 <?php
-include_once 'Config/DbConn.php';
+include_once 'DbConn.php';
 
-include_once 'Gateways/ItemTypeGateway.php';
+include_once 'Gateways/OrdersGateway.php';
 
-
-class ItemTypeController
+class OrdersController
 {
     private $db;
     private $requestMethod;
     private $input;
-    private $itemtypegateway;
+    private $ordersgateway;
 
     public function __construct( $requestMethod, $input)
     {
-       
         $db = new DbConn();
-       
+
         $this->requestMethod = $requestMethod;
         $this->input = $input;
 
-        $this->itemtypegateway = new ItemtypeGateway($db->getConnection());
+        $this->ordersgateway = new OrdersGateway($db->getConnection());
     }
 
     public function processRequest()
@@ -72,7 +70,7 @@ class ItemTypeController
 
         }*/
                 
-        $this->itemtypegateway->Insert($input);
+        $this->ordersgateway->Insert($input);
 
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
 
@@ -84,7 +82,7 @@ class ItemTypeController
 
     private function GetOneFromRequest($id)
     {
-        $result = $this->itemtypegateway->Find($id);
+        $result = $this->ordersgateway->Find($id);
 
         /*if (! $result) {
             return $this->notFoundResponse();
@@ -97,7 +95,7 @@ class ItemTypeController
 
     private function GetAll()
     {
-        $result = $this->itemtypegateway->FindAll();
+        $result = $this->ordersgateway->FindAll();
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
        
@@ -107,7 +105,7 @@ class ItemTypeController
     private function UpdateFromRequest($id)
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        $this->itemtypegateway->Update($id, $input);
+        $this->ordersgateway->Update($id, $input);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -115,11 +113,11 @@ class ItemTypeController
 
     private function Delete($id)
     {
-        $result = $this->itemtypegateway->find($id);
+        $result = $this->ordersgateway->find($id);
         if (! $result) {
             return $this->NotFoundResponse();
         }
-        $this->itemtypegateway->Delete($id);
+        $this->ordersgateway->Delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -157,5 +155,8 @@ class ItemTypeController
         $response['body'] = null;
         return $response;
     }
+
+
 }
+
 ?>

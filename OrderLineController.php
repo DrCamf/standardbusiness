@@ -1,15 +1,15 @@
 <?php
+include_once 'DbConn.php';
 
-include_once 'Config/DbConn.php';
+include_once 'Gateways/OrderLineGateway.php';
 
-include_once 'Gateways/BoughtGateWay.php';
-
-class BoughtController
+class OrderLineController
 {
+
     private $db;
     private $requestMethod;
     private $input;
-    private $boughtgateway;
+    private $orderlinegateway;
 
     public function __construct( $requestMethod, $input)
     {
@@ -18,7 +18,7 @@ class BoughtController
         $this->requestMethod = $requestMethod;
         $this->input = $input;
 
-        $this->boughtgateway = new BoughtGateWay($db->getConnection());
+        $this->orderlinegateway = new OrderLineGateway($db->getConnection());
     }
 
     public function processRequest()
@@ -71,7 +71,7 @@ class BoughtController
 
         }*/
                 
-        $this->boughtgateway->Insert($input);
+        $this->orderlinegateway->Insert($input);
 
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
 
@@ -83,7 +83,7 @@ class BoughtController
 
     private function GetOneFromRequest($id)
     {
-        $result = $this->boughtgateway->Find($id);
+        $result = $this->orderlinegateway->Find($id);
 
         /*if (! $result) {
             return $this->notFoundResponse();
@@ -96,7 +96,7 @@ class BoughtController
 
     private function GetAll()
     {
-        $result = $this->boughtgateway->FindAll();
+        $result = $this->orderlinegateway->FindAll();
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
        
@@ -106,7 +106,7 @@ class BoughtController
     private function UpdateFromRequest($id)
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        $this->boughtgateway->Update($id, $input);
+        $this->orderlinegateway->Update($id, $input);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -114,11 +114,11 @@ class BoughtController
 
     private function Delete($id)
     {
-        $result = $this->boughtgateway->find($id);
+        $result = $this->orderlinegateway->find($id);
         if (! $result) {
             return $this->NotFoundResponse();
         }
-        $this->boughtgateway->Delete($id);
+        $this->orderlinegateway->Delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
@@ -157,4 +157,5 @@ class BoughtController
         return $response;
     }
 }
+
 ?>
