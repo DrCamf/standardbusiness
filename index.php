@@ -1,5 +1,5 @@
 <?php
-
+include_once 'AccountController.php';
 include_once 'UserController.php';
 include_once 'ItemController.php';
 include_once 'OrdersController.php';
@@ -71,6 +71,10 @@ switch($pass)
                     
     case 'usertype':
         $controller = new UserTypeController($requestMethod, $id);
+        break;
+
+    case 'account':
+        $controller = new AccountController($requestMethod, $id);
         break;
 
     default:

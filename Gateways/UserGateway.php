@@ -8,7 +8,7 @@ class UserGateway
 
     public function Insert(Array $input )
     {
-        if (array_key_exists('firstName', $input)) 
+        if (array_key_exists('firstname', $input)) 
         {
             $statement = "INSERT INTO `Users`(`firstName`, `lastName`, `tlfnr`, `email`, `adress`, `zip_id`, `type_id`, `account_id`) 
             VALUES (:firstname, :lastname, :tlfnr, :email, :adress, :zipid, :typeid, :accountid);";
@@ -92,7 +92,7 @@ class UserGateway
     {
        
         $statement ="
-        SELECT `firstName`, `lastName`, `tlfnr`, `email`, `adress`, City.zip, City.name, UserType.name
+        SELECT SELECT `firstName` AS FirstName, `lastName` AS LastName, `tlfnr` AS PHONE, `email` AS EMAIL, `adress` AS Adress, City.zip AS ZIP,  City.name AS CITY, UserType.name AS TYPE
         FROM Users 
         INNER JOIN City ON Users.zip_id = City.id
         INNER JOIN UserType ON Users.type_id = UserType.id 
@@ -123,7 +123,7 @@ class UserGateway
 
     public function FindAll() 
     {
-        $statement = "SELECT `firstName`, `lastName`, `tlfnr`, `email`, `adress`, City.zip, City.name, UserType.name
+        $statement = "SELECT `firstName` AS FirstName, `lastName` AS LastName, `tlfnr` AS PHONE, `email` AS EMAIL, `adress` AS Adress, City.zip AS ZIP,  City.name AS CITY, UserType.name AS TYPE
         FROM Users 
         INNER JOIN City ON Users.zip_id = City.id
         INNER JOIN UserType ON Users.type_id = UserType.id; "; //evt order by 

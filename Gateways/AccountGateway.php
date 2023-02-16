@@ -10,10 +10,11 @@ class AccountGateway
     {
         if (array_key_exists('password', $input)) {
             $statement = "INSERT INTO `Account`(`password`) VALUES (:password); ";
+            $param_password = password_hash($input['password'], PASSWORD_DEFAULT);
             try 
             {
                 $statement = $this->db->prepare($statement);
-                $statement->execute(array('password' => $input['password']));
+                $statement->execute(array('password' => $param_password));
                 return $statement->rowCount();
             } 
             catch (\PDOException $e) 
