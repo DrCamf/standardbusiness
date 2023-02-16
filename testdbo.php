@@ -1,13 +1,6 @@
 <?php
 
-$host = "localhost";  
 
-     $username = "clvsnhfo_mand";  
- 
-     $password = "Bobthegod?42";  
- 
-     $database = "clvsnhfo_StandardBusiness";  
-     $dbConnection = null;
 echo "outside";
 
 try{
